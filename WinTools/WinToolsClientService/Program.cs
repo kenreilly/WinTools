@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management;
+using System.Management.Instrumentation;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
-using System.Management;
-using System.Management.Instrumentation;
 
 namespace WinToolsClientService
 {
-	static class Program
+	public static class Core
 	{
 		/// <summary>
 		/// The main entry point for the application.
@@ -24,19 +24,28 @@ namespace WinToolsClientService
 			ServiceBase.Run(ServicesToRun);
 		}
 
-
-		public static string getAssetTag()
+        private static string _assetTag = String.Empty;
+		public static string AssetTag
 		{
-			string cpuInfo = string.Empty;
-			ManagementClass mc = new ManagementClass("win32_processor");
-			ManagementObjectCollection moc = mc.GetInstances();
+            get {
+                if (_assetTag != String.Empty) {
+                    return _assetTag;
+                }
 
-			foreach (ManagementObject mo in moc)
-			{
-				cpuInfo = mo.Properties["processorID"].Value.ToString();
-				break;
-			}
-			return string.Empty;
+                string cpuInfo = string.Empty;
+                ManagementClass mc = new ManagementClass("win32_processor");
+                ManagementObjectCollection moc = mc.GetInstances();
+
+                foreach (ManagementObject mo in moc)
+                {
+                    cpuInfo = mo.Properties["processorID"].Value.ToString();
+                    break;
+                }
+
+                _assetTag = cpuInfo;
+
+                return _assetTag;
+            }
 		}
 	}
 }
